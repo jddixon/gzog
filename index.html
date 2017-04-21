@@ -1,1 +1,121 @@
-dummy index
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>gzog</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="css/main.css" />
+  <link rel="stylesheet" type="text/css" href="css/normalize.css" />
+  <link rel="stylesheet" type="text/css" href="css/ghp.css" />
+</head>
+<body>
+<div class="content">
+<h1 class="libTop">gzog</h1>
+
+<p>This describes an experimental implementation of a simple protocol for
+communications between a number of servers (daemons) organized in a full
+mesh and one or more clients external to the ring.</p>
+<p>For historical reasons the daemon is called <code>zog</code> and its Go
+implementation <code>gzog</code>.  There is a client called <code>sprog</code>; its Go
+implementation is of course <code>gsprog</code>.</p>
+<p>Participants send messages, simple strings, to one another using
+<strong>tcp/ip</strong>, one of the
+<a href="https://en.wikipedia.org/wiki/internet_protocol_suite">standard Internet protocols</a>.</p>
+<h3>Ring</h3>
+<p><img align="right" src="img/fullMesh.png">
+The system runs on a set of five or so machines, each housing a <strong>zog daemon</strong>
+listening for messages from the other daemons on port 55551.
+Servers are connected in a full mesh, seeing other machines as <code>+1</code>, <code>+2</code>,
+etc on the ring.
+Each server has to send a keep-alive
+at least every 300s to keep a connection open.</p>
+<p>Daemons log all messages to either <code>access.log</code> or <code>error.log</code>, with
+CRLF terminated messages of reasonable length (&lt;512 bytes) being
+logged to <code>access.log</code> and all other messages reported to <code>error.log</code>.</p>
+<p>Daemons also listen for traffic from clients on port 55552.</p>
+<p>For the purpose of this exercise, the ring consists of five machine
+with addresses in
+<a href="https:/tools.ietf.org/rfc1918">private address space</a>, 192.168/8</p>
+<ul>
+<li><strong>MV</strong>, 192.168.152.242</li>
+<li><strong>PA</strong>, 192.168.152.252</li>
+<li><strong>G</strong>,  192.168.152.254</li>
+<li><strong>LA</strong>, 192.168.152.253</li>
+<li><strong>S</strong>,  192.168.152.11</li>
+</ul>
+<h3>Daemons</h3>
+<p><TBD></p>
+<h3>Clients</h3>
+<p>Clients run <strong>gsprog</strong>, which talks to the gzog daemons on port 55552.
+At least one gsprog client will run. By default the
+client will send messages at configurable intervals to a randomly selected
+server.  Command line switches will
+be available to change this behavior, to round-robin (-r/--roundRobin) or
+to target a specific host (<code>-s/--specificHost</code>).  If the testing option
+is chosen, <code>specificHost</code> will be <code>127.0.0.1</code>.</p>
+<p>The default interval should be 10s.</p>
+<p>Gzog messages are simple strings,
+<a href="http://unicode.org/standard/WhatIsUnicode.html">Unicode</a>
+encoded as
+<a href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</a>.</p>
+<h3>Messages</h3>
+<p>In this implementation,
+messages are standard Go strings preceded by a single character, a digit, the
+<strong>wrapping</strong> byte.</p>
+<p>The wrapping byte will be one of <code>0</code>, <code>1</code>, or <code>2</code>.  That is, it will be
+a single ASCII character, a digit.</p>
+<p>Content will be quasi-random with lengths (<code>-i/--interval</code>) in the range
+<code>[32..63]</code> inclusive, <strong><em>not</em></strong> counting the wrapping byte.  Content will
+consist of printing characters.  [Content length should be adjusted as
+necessary to keep log lines within 80 characters.]</p>
+<h3>Message Handling</h3>
+<p>On receiving a message other than a keep-alive from a client, a server will
+forward it to its <code>+1</code> and <code>+2</code> peers with <code>1</code> and <code>2</code> <strong>wrappings</strong>
+respectively.</p>
+<h4>Daemon-Daemon Messages</h4>
+<p>On receiving a message from a peer, a server will examine its envelope.
+All messages will be logged AFTER any forwarding.</p>
+<p>If the wrapping is <code>0</code> (the digit zero), the message will just be logged.  If the wrapping
+is <code>1</code>, the message will be forwarded to the peer's <code>+3</code> server with a zero
+wrapping.  If the wrapping is <code>2</code>, the message will be forwarded to the
+<code>+4</code> server with a zero wrapping.</p>
+<h4>Client-Daemon Messages</h4>
+<p>On receiving a message from a client which is other than a keep-alive
+a server will forward it to its <code>+1</code> and <code>+2</code> peers with a <code>2</code> wrapping
+in each case.</p>
+<p>If the wrapping is <code>0</code> (zero), the message will just be logged.</p>
+<p>If the wrapping is <code>1</code>, the message will be forwarded to the receiver's
+<code>+1</code> peer with a zero wrapping.  [We will not use this wrapping in the
+current configuration.]</p>
+<p>If the wrapping is <code>2</code>, the message will be forwarded to the
+receiver's <code>+2</code> peer with a zero wrapping.</p>
+<h4>Protocol</h4>
+<p>gzog
+<a href="http://www.webopedia.com/TERM/P/protocol.html">protocol</a>
+should be <code>org.xlattice.gzog</code>
+and should at this point
+define two message pairs: <code>keepAlive</code> and <code>ack</code>, and <code>data</code> and <code>ok</code>.</p>
+<h2>Project Status</h2>
+<p>Pre-Alpha.</p>
+<h2>Licensing</h2>
+<p><a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />The material on this github.io website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.</p>
+<p>Project software is licensed under an MIT license.
+Follow the SOFTWARE LICENSE link below for more information on project software licensing.</p>  <div class="f">
+    <hr />
+    <div class="license">
+      <p><a href="LICENSE-MIT.html">SOFTWARE LICENSE</a></p>
+    </div>
+    <div class="project">
+      github <a href="https://github.com/jddixon/gzog">      <img src="img/GitHub-Mark-32px.png" 
+        alt="link to project"  
+        style="display: inline-block; margin-left: 0 auto; margin-right: 0 auto">
+       </a> project
+    </div>
+    <div class="logo" >
+      <a href="https://jddixon.github.io/xlattice/">
+      <img src="img/xlattice-2014.jpg" alt="the XLattice Project" style="float: right;" >
+      </a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
