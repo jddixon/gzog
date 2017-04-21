@@ -1,2 +1,14 @@
 go/src/github.com/jddixon/gzog/CHANGES
 
+v0.0.2
+    2017-04-21
+        * add README.txt, edit config files                         SLOC  134
+v0.0.1
+    2017-04-20
+        * add configurtion files                                    SLOC   91
+
+
+v0.0.1
+    2017-04-20
+        initial commit
+
