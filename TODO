@@ -1,2 +1,5 @@
 go/src/github.com/jddixon/gzog/TODO
 
+2017-04-26
+    * FIX: ./installit gets 'no go executables found'
+
