@@ -34,7 +34,7 @@ with addresses in
 
 * **MV**, 192.168.152.242
 * **PA**, 192.168.152.252
-* **G**,  192.168.152.254
+* **LG**, 192.168.136.254
 * **LA**, 192.168.152.253
 * **S**,  192.168.152.11
 
@@ -75,34 +75,21 @@ necessary to keep log lines within 80 characters.]
 
 ### Message Handling
 
-On receiving a message other than a keep-alive from a client, a server will
-forward it to its `+1` and `+2` peers with `1` and `2` **wrappings**
-respectively.
-
-#### Daemon-Daemon Messages
-
-On receiving a message from a peer, a server will examine its envelope.
-All messages will be logged AFTER any forwarding.
-
-If the wrapping is `0` (the digit zero), the message will just be logged.  If the wrapping
-is `1`, the message will be forwarded to the peer's `+3` server with a zero
-wrapping.  If the wrapping is `2`, the message will be forwarded to the
-`+4` server with a zero wrapping.
-
 #### Client-Daemon Messages
 
 On receiving a message from a client which is other than a keep-alive
 a server will forward it to its `+1` and `+2` peers with a `2` wrapping
 in each case.
 
-If the wrapping is `0` (zero), the message will just be logged.
+#### Daemon-Daemon Messages
 
-If the wrapping is `1`, the message will be forwarded to the receiver's
-`+1` peer with a zero wrapping.  [We will not use this wrapping in the
-current configuration.]
+On receiving a message from a peer, a server will examine its envelope.
+All messages will be logged BEFORE any forwarding.
 
-If the wrapping is `2`, the message will be forwarded to the
-receiver's `+2` peer with a zero wrapping.
+If the wrapping is `0` (the digit zero), the message will just be logged.  If the wrapping
+is `1`, the message will be forwarded to the peer's `+3` server with a zero
+wrapping.  If the wrapping is `2`, the message will be forwarded to the
+`+4` server with a zero wrapping.
 
 #### Protocol
 

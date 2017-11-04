@@ -1,0 +1,23 @@
+# projConfig.toml for gzog
+
+[meta]
+    version = '0.1.0'
+
+[project]
+    name = 'gzog'  # distro name
+    package = 'gzog'  # internal name
+    main_lang = 'go'
+    version = '0.0.5'
+    version_date = '2017-11-04'
+    author = 'Jim Dixon'
+    author_email = 'jddixon@gmail.com'
+    copyright = '2017'
+    description = 'toy distributed database'
+    dev_status = 'pre-alpha'
+    license = 'mit'
+    relpath = 'go/src/github.com/jddixon/gzog'
+    state = 'shared'
+    url = 'https://jddixon.github.io/gzog'
+
+[go]
+    cmds=['gzog', 'gsprog']
