@@ -1,6 +1,6 @@
 package gzog
 
 const (
-	VERSION      = "0.0.4"
-	VERSION_DATE = "2017-05-13"
+	VERSION      = "0.0.5"
+	VERSION_DATE = "2017-11-03"
 )
